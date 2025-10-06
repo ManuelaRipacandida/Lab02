@@ -1,21 +1,109 @@
+import csv
+
+
 def carica_da_file(file_path):
     """Carica i libri dal file"""
     # TODO
+    try:
+        with open(file_path, "r") as f:
+            csvReader =csv.reader(f)
+            biblioteca = []
+            num_sezioni = int(next(csvReader)[0].strip())# salta la prima riga
+
+
+            for line in csvReader:
+                titolo=line[0]
+                autore=line[1]
+                anno=int(line[2])
+                pagine=int(line[3])
+                sezione=int(line[4])
+                libro={
+                    "titolo":titolo,
+                    "autore":autore,
+                    "anno":anno,
+                    "pagine":pagine,
+                    "sezione":sezione,
+                }
+                biblioteca.append(libro)
+
+            return biblioteca
+    except FileNotFoundError:
+        print("File non trovato.")
+        return None
+
+
 
 
 def aggiungi_libro(biblioteca, titolo, autore, anno, pagine, sezione, file_path):
     """Aggiunge un libro nella biblioteca"""
     # TODO
+    sezioni_valide = {1, 2, 3, 4, 5}
+    if sezione not in sezioni_valide:
+        print(f" Sezione '{sezione}' non esistente. ")
+        return None
+    for libro in biblioteca:
+        if libro["titolo"].lower() == titolo.lower():
+            print(" Libro già presente nella biblioteca.")
+            return None
+    nuovo_libro={
+        "titolo": titolo,
+        "autore": autore,
+        "anno": anno,
+        "pagine": pagine,
+        "sezione": sezione,
+    }
+    biblioteca.append(nuovo_libro)
+    try:
+        with open(file_path, "a", encoding="utf-8") as f:
+            riga = f"{titolo},{autore},{anno},{pagine},{sezione}\n"
+            f.write(riga)
+    except FileNotFoundError:
+        print(f" File non trovato")
+        return None
+
+
+    print(f" Libro '{titolo}' aggiunto con successo!")
+    return nuovo_libro
+
 
 
 def cerca_libro(biblioteca, titolo):
     """Cerca un libro nella biblioteca dato il titolo"""
+
+
+    #se il libro è presente viene restituita una stringa
+    for libro in biblioteca:
+        if libro["titolo"].lower() == titolo.lower():
+            return f"{libro['titolo']}, {libro['autore']}, {libro['anno']}, {libro['pagine']}, sezione {libro['sezione']}"
+    return None
+
     # TODO
 
 
 def elenco_libri_sezione_per_titolo(biblioteca, sezione):
     """Ordina i titoli di una data sezione della biblioteca in ordine alfabetico"""
+
     # TODO
+    sezione_valida = {1, 2, 3, 4, 5}
+
+    if sezione not in sezione_valida:
+        print(f"Sezione '{sezione}' non esistente.")
+        return None
+
+    #crea una nuova lista per sezione
+    libri_nella_sezione = []
+    for libro in biblioteca :
+         if libro["sezione"] == sezione:
+             libri_nella_sezione.append(libro["titolo"])
+    #gestione sezione vuota
+    if not libri_nella_sezione:
+        print(f"Nessun libro trovato nella sezione {sezione}.")
+        return None
+
+    # Ordina alfabeticamente i libri per titolo
+    libri_ordinati = sorted(libri_nella_sezione)
+
+    return libri_ordinati
 
 
 def main():
